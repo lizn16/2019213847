@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<style type="text/css">
+		*{
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+		html,body{
+			width: 100%;
+			background-color: #f0f3f8;
+		}
+		.head{
+			width: 100%;
+			height: 50px;
+			background: #eafff0;
+		}
+		.grid-box{
+			width: 100%;
+			height: 100%;
+			display: grid;
+			grid-template-columns: 2fr 8fr;
+			grid-template-rows: 1fr auto;
+			grid-row-gap: 10px;
+		}
+		.grid-box.box1{
+			grid-area: 1/1/4/1;
+		}
+		.grid-box.box1.nav{
+			width: 98%;
+			height: 100%;
+			background: #fff;
+			border-radius: 0 10px 10px 0;
+			
+		}
+		.grid-box.box2{
+			display: grid;
+			justify-content: center;
+			align-items: center;
+		}
+		.grid-box.box2.title{
+			width: 1200px;
+			height: 55px;
+			border-radius: 10px;
+			background: #fff;
+		}
+		img{
+			width: 400px;
+			height: 300px;
+		}
+		
+
+		.footer{
+			width: 100%;
+			height: 58px;
+			background:#eafff0;
+		}
+		</style>
+	</head>
+	<body>
+		<header class="head">
+			<h1 align="center">个人主页</h1>
+		</header>
+		<div class="grid-box">
+			<div class="box1">
+				<div class="nav" style="font-size: 28px;">个人信息</div>
+			</div>
+			<div class="box2" style="font-size: 21px;">
+				<div class="title">姓名：李知娜</div>
+				<div class="title">出生日期：2001.2.16</div>
+				<div class="title">爱好：看电影、旅游、逛街</div>
+			</div>
+			<div class="box1">
+				<div class="nav" style="font-size: 28px;">一些照片</div>
+			</div>
+			<div class="box2">
+				<img src="111.jpg" />
+				<img src="1111.jpg" />
+				<img src="222.jpg" />
+				<img src="11111.jpg" />
+				<img src="2222.jpg" />
+				<img src="22222.jpg" />
+			</div>
+		</div>
+		<footer class="footer">
+			<h1 align="center">谢谢大家</h1>
+		</footer>
+	</body>
+</html>
