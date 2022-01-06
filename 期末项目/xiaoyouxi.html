@@ -1,0 +1,326 @@
+<!DOCTYPE html >
+<html>
+	<head>
+		<meta charset="utf-8">
+		<script language="javascript" src="./jquery-1.8.2.min.js"></script>		
+		<title>打砖块游戏</title>
+		<style type="text/css">
+		.title{
+			color: #0000cc;
+			font-size: 30px;
+			position: fixed;
+			left: 240px;
+			top: 24%;
+		}
+		button{
+			color: #0000cc;
+			margin-top: 20px;
+			font-size: 24px;
+			position: fixed;
+			left: 45%;
+			top: 85%;
+			
+		}
+		strong{
+			color: #0000cc;
+			margin-top: 20px;
+			font-size: 24px;
+			position: fixed;
+			right: 260px;
+			top: 20%;
+		}
+		#s{
+			color: #0000cc;
+			margin-top: 20px;
+			font-size: 20px;
+			position: fixed;
+			left: 235px;
+			top: 30%;
+		}
+		</style>
+	</head>
+	<body>
+		<div class="title">打砖块游戏</div>
+		<canvas id="can" width="600px" height="600px" style="background-image: url(0102.jpg);margin: auto 450px;"></canvas>
+		<button class="start" id="btn">开始游戏</button>
+		<select id="s">
+		    <option>--请选择难度--</option>
+		    <option>简单</option>
+		    <option>中等</option>
+		    <option>较难</option>
+		</select>
+	</body>
+	<script>
+		var canvas=document.getElementById("can");
+		var context=canvas.getContext("2d");
+		var x,y;  //球坐标
+		var dx,dy;
+		var boardh;
+		var boardw;
+		var boardx;
+		var ballr;
+		var brickw,brickh;
+		var brickrow,brickcolumn;
+		var brickpadding;
+		var bricktop,brickleft;
+		var right=false,left=false;  //键盘按钮
+		var cstatus=true;  //是否按停止键
+		var stop_status=true;  //停止键是否有效
+		var stop;  //停止
+		var score=0;
+		var bricks=[];
+		var more=0;
+		$(document.getElementById("s")).click(function(){
+			start();
+			drawball();
+			drawbricks();
+			drawboard(boardx);
+			drawscore();
+			
+			
+			
+		})
+		
+		$(".start").click(function(){
+			
+			//context.clearRect(0, 0, canvas.width, canvas.height);
+			
+			stop_status=true;
+			draw();
+			//实时监听操作键盘和鼠标事件
+			document.addEventListener("keydown", keydown, false);
+			document.addEventListener("keyup", keyup, false);
+			document.addEventListener("mousemove", mousemove, false);
+			var btn=document.getElementById("btn");
+			btn.disabled=true;
+			
+		})
+		function start(){
+			switch (document.getElementById("s").value){
+				case "简单":{
+					x=canvas.width/2;
+					y=canvas.height-45;
+					boardh=30;
+					boardx=200;
+					ballr=13;
+					brickw=90;
+					brickh=25;
+					brickrow=5;
+					brickcolumn=6;
+					brickpadding=6;
+					bricktop=35;
+					brickleft=15;
+					for (var c=0;c<brickcolumn;c++) {
+						bricks[c]=[];
+						for (var r=0;r<brickrow;r++) {
+							bricks[c][r]={x:0,y:0,status:1};
+						}
+					}
+					dx=-3,dy=-3;  //球移动速度
+					boardw=200;
+					if(more==1){
+						context.clearRect(0, 0, canvas.width, canvas.height);
+					}
+					break;
+				}
+				case "中等":{
+					x=canvas.width/2;
+					y=canvas.height-45;
+					boardh=30;
+					boardx=230;
+					ballr=13;
+					brickw=90;
+					brickh=25;
+					brickrow=6;
+					brickcolumn=6;
+					brickpadding=6;
+					bricktop=35;
+					brickleft=15;
+					for (var c=0;c<brickcolumn;c++) {
+						bricks[c]=[];
+						for (var r=0;r<brickrow;r++) {
+							bricks[c][r]={x:0,y:0,status:1};
+						}
+					}
+					dx=-6,dy=-6;  //球移动速度
+					boardw=150;
+					if(more==1){
+						context.clearRect(0, 0, canvas.width, canvas.height);
+					}
+					break;
+				}
+				case "较难":{
+					x=canvas.width/2;
+					y=canvas.height-45;
+					boardh=30;
+					boardx=250;
+					ballr=13;
+					brickw=90;
+					brickh=25;
+					brickrow=7;
+					brickcolumn=6;
+					brickpadding=6;
+					bricktop=35;
+					brickleft=15;
+					for (var c=0;c<brickcolumn;c++) {
+						bricks[c]=[];
+						for (var r=0;r<brickrow;r++) {
+							bricks[c][r]={x:0,y:0,status:1};
+						}
+					}
+					dx=-9,dy=-9;  //球移动速度
+					boardw=100;
+					if(more==1){
+						context.clearRect(0, 0, canvas.width, canvas.height);
+					}
+					break;
+				}
+			}
+		}
+		function drawball() {
+			context.fillStyle='#1F3894'
+			context.beginPath();
+			context.arc(x,y,ballr,0,Math.PI*2,true);
+			context.closePath();
+			context.fill();
+		}
+		function drawboard(boardx) {
+			context.fillStyle='#181B50';
+			context.fillRect(boardx,canvas.height-boardh,boardw,boardh);
+		}
+		function drawbricks() {
+			for(var c=0;c<brickcolumn;c++) {
+			   for(var r=0;r<brickrow;r++) {
+				   if(bricks[c][r].status==1) {
+					   var brickx=(c*(brickw+brickpadding))+brickleft;
+					   var bricky=(r*(brickh+brickpadding))+bricktop;
+					   bricks[c][r].x=brickx;
+					   bricks[c][r].y=bricky;
+					   context.fillStyle="#327EDF";
+					   context.fillRect(brickx,bricky,brickw,brickh);
+				    }
+			    }
+			}
+		}
+		function drawscore() {
+			context.font="20px Arial";
+			context.fillStyle="#181B50";
+			context.fillText("Score: "+score,15,20);
+		}
+		function drawover() {
+			context.font="40px Arial";
+			context.fillStyle="#181B50";
+			context.fillText("GAME OVER",180,300);
+		}
+		function drawwin() {
+			context.font="40px Arial";
+			context.fillStyle="#181B50";
+			context.fillText("YOU WIN!",180,300);
+		}
+		function keydown(e) {
+			if(e.keyCode==39) {
+			   right=true;
+			}
+			else if(e.keyCode==37) {
+			   left=true;
+			}
+			else if(e.keyCode==32){
+			   if(stop_status){
+				   if(cstatus){
+					   window.cancelAnimationFrame(stop);  //停止
+					   cstatus=false;
+					}else{
+					   stop=requestAnimationFrame(draw);  //继续
+					   cstatus=true;
+					}
+				}
+			}
+		}
+		function keyup(e) {
+			if(e.keyCode==39) {
+			   right=false;
+			}
+			else if(e.keyCode==37) {
+			   left=false;
+			}
+		}
+		function mousemove(e) {
+			var mx=e.clientX-canvas.offsetLeft;
+			
+			if(mx>=0&&mx<canvas.width) {
+			   boardx=mx-boardw/2;
+			}
+		}
+		function ballbrick(){
+			for(c=0; c<brickcolumn; c++) {
+				for(r=0; r<brickrow; r++) {
+					var b=bricks[c][r];
+					if(b.status==1){
+						if(x<b.x+brickw&&x>b.x&&y<b.y+brickh&&y>b.y){
+							dy=-dy;
+							b.status=0;
+							score++;
+						}
+					}
+					
+				}
+			}
+		}
+		function draw() {
+			context.clearRect(0, 0, canvas.width, canvas.height);
+			drawboard(boardx);
+			
+			drawball();
+			
+			drawbricks();
+			drawscore();
+			ballbrick();
+			
+			//水平方向
+			if(x+dx<ballr||x+dx>canvas.width-ballr) {
+			   dx=-dx;
+			}
+			//垂直方向
+			if(y+dy<ballr) {
+			   dy=-dy;
+			}
+			//底部
+			else if(y+dy>=canvas.height-ballr-boardh) {
+				if(x>boardx&&x<boardx+boardw) {  //接住了球
+					dy=-dy;
+					if(score==brickcolumn*brickrow){
+						
+						stop_status=false;
+						btn.disabled=false;
+						drawwin();
+						return;
+					}
+			    }
+			    else if(y+dy>canvas.height+20) {
+					//游戏结束
+					
+					score=0;
+					stop_status=false;
+					btn.disabled=false;
+					more=1;
+					drawover();  //结束游戏
+					return;
+				}
+			}
+			 //接盘移动
+			 drawboard();
+			if(right&&boardx<canvas.width-boardw) {
+				boardx+=5;
+			}
+			else if(left&&boardx>0) {
+				boardx-=5;
+			}
+			
+			x+=dx;
+			y+=dy;
+			stop=requestAnimationFrame(draw);
+			
+		}
+		
+		</script>
+</html>
